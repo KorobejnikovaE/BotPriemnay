@@ -84,7 +84,7 @@ for event in longpoll.listen():
                 cur = connection.cursor()
                 # Добавляем заявление в таблицу
                 cur.execute("INSERT INTO  (name, deadline, statements, id_user) VALUES (%s, %s, %s, %s)",
-                            (params[1], params[2], paramy[3], id_user))
+                            (params[1], params[2], params [3], id_user))
                 connection.commit()
                 cur.close()
 for event in longpoll.listen():
