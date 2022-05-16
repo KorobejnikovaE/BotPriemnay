@@ -80,11 +80,11 @@ for event in longpoll.listen():
             request = str(event.text)
             # Массив элементов команды
             params = re.split(";|,",request)
-            if params[0] in {'задача', 'task', 'add', 'добавить'}:
+            if params[0] in {'','statements', 'add', 'добавить'}:
                 cur = connection.cursor()
-                # Добавляем задачу в таблицу
-                cur.execute("INSERT INTO tasks (name, deadline, tags, id_user) VALUES (%s, %s, %s, %s)",
-                            (params[1], params[2], params[3], id_user))
+                # Добавляем заявление в таблицу
+                cur.execute("INSERT INTO  (name, deadline, statements, id_user) VALUES (%s, %s, %s, %s)",
+                            (params[1], params[2], paramy[3], id_user))
                 connection.commit()
                 cur.close()
 for event in longpoll.listen():
