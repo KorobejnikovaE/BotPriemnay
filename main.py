@@ -1,3 +1,4 @@
+import mysql.connector
 import vk_api
 import pymysql
 import os
@@ -7,8 +8,12 @@ import dateparser
 import re
 from timefhuman import timefhuman
 from dotenv import load_dotenv
+
 load_dotenv()
-token = os.getenv('token')
+env_path = Path('.')/'.env'
+load_dotenv(dotenv_path=env_path)
+
+token = os.getenv("token")
 vk = vk_api.VkApi(token=token)
 from vk_api.longpoll import VkLongPoll, VkEventType
 longpoll = VkLongPoll(vk)
@@ -20,7 +25,8 @@ password = os.getenv('password')
 database = os.getenv('database')
 charset = os.getenv('charset')
 
-connection = pymysql.connect(host=host, user=user, password=password, db=database, charset=charset, cursorclass=pymysql.cursors.DictCursor)
+connection = mysql.connector.connect(
+    host=host, user=user, password=password, db=database, charset=charset, cursorclass=pymysql.cursors.DictCursor)
 
 # Таймер для выполнения
 #
