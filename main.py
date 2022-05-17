@@ -6,17 +6,13 @@ import random
 import threading
 import dateparser
 import re
-from timefhuman import timefhuman
+#from timefhuman import timefhuman
 from dotenv import load_dotenv
-
 load_dotenv()
-env_path = Path('.')/'.env'
-load_dotenv(dotenv_path=env_path)
-
 token = os.getenv("token")
 vk = vk_api.VkApi(token=token)
 from vk_api.longpoll import VkLongPoll, VkEventType
-longpoll = VkLongPoll(vk)
+longpoll = VkLongPoll(vk_session)
 
 host = os.getenv('host')
 port = os.getenv('port')
@@ -79,8 +75,8 @@ for event in longpoll.listen():
             rows = cur.fetchall()
             for row in rows:
                 id_user = row['id']
-            print(id_user)
-            vk.method('messages.send', {'peer_id': event.user_id, 'message': 'Привет, ' + user["first_name"] + '! Я бот!',
+            print('id_user')
+            vk.method('messages.send', {'peer_id': event.user_id, 'message': 'Приветствую Вас, ' + user["first_name"] + '! Я бот!',
                                         'random_id': random.randint(0, 1000)})
             # Текст сообщения пользователя
             request = str(event.text)
@@ -90,15 +86,26 @@ for event in longpoll.listen():
                 cur = connection.cursor()
                 # Добавляем заявление в таблицу
                 cur.execute("INSERT INTO  (name, deadline, statements, id_user) VALUES (%s, %s, %s, %s)",
-                            (params[1], params[2], params [3], id_user))
+                            (params[1], params[2],params[3].strip(' '), id_user))
                 connection.commit()
                 cur.close()
-for event in longpoll.listen():
-    if event.type == VkEventType.MESSAGE_NEW:
-      if event.to_me:
+            else:
+                cur = connection.cursor()
+                cur.execute("SELECT * FROM users,tasks WHERE tasks.id_user = users.id and vk_id=" + str(user["id"]))
+                rows = cur.fetchall()
+                msg = ''
+                for row in rows:
+                    print(row)
+                    msg = msg + str(row['tasks.id']) + ' ' + row['name'] + ' ' + str(row['deadline']) + '\n'
+                vk.method('messages.send',
+                          {'peer_id': event.user_id, 'message': msg, 'random_id': random.randint(0, 1000)})
+
+#for event in longpoll.listen():
+#    if event.type == VkEventType.MESSAGE_NEW:
+ #     if event.to_me:
             # Сообщение от пользователя
-            request = event.text
-            user = vk.method("users.get", {"user_id":event.user_id, "fields": "photo_id, verified, sex, bdate, city, country, home_town, has_photo, photo_50, photo_100, photo_200_orig, photo_200, photo_400_orig, photo_max, photo_max_orig, online, domain, has_mobile, contacts, site, education, universities, schools, status, last_seen, followers_count, occupation, nickname, relatives, relation, personal, connections, exports, activities, interests, music, movies, tv, books, games, about, quotes, can_post, can_see_all_posts, can_see_audio, can_write_private_message, can_send_friend_request, is_favorite, is_hidden_from_feed, timezone, screen_name, maiden_name, crop_photo, is_friend, friend_status, career, military, blacklisted, blacklisted_by_me, can_be_invited_group"})[0]
-            print("Пришло сообщение от пользователя"+ user["first_name"] + user["last_name"])
-            send_msg(vk, event.user_id, "Здравствуйте,"+ user["first_name"] + user["last_name"])
-            send_msg(vk, event.user_id, "Здравствуйте," + user["first_name"] + user["last_name"])
+  #          request = event.text
+          #  user = vk.method("users.get", {"user_id":event.user_id, "fields": "photo_id, verified, sex, bdate, city, country, home_town, has_photo, photo_50, photo_100, photo_200_orig, photo_200, photo_400_orig, photo_max, photo_max_orig, online, domain, has_mobile, contacts, site, education, universities, schools, status, last_seen, followers_count, occupation, nickname, relatives, relation, personal, connections, exports, activities, interests, music, movies, tv, books, games, about, quotes, can_post, can_see_all_posts, can_see_audio, can_write_private_message, can_send_friend_request, is_favorite, is_hidden_from_feed, timezone, screen_name, maiden_name, crop_photo, is_friend, friend_status, career, military, blacklisted, blacklisted_by_me, can_be_invited_group"})[0]
+           # print("Пришло сообщение от пользователя"+ user["first_name"] + user["last_name"])
+          #  send_msg(vk, event.user_id, "Здравствуйте,"+ user["first_name"] + user["last_name"])
+            #send_msg(vk, event.user_id, "Здравствуйте," + user["first_name"] + user["last_name"])
