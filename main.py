@@ -24,25 +24,13 @@ password = os.getenv('password')
 database = os.getenv('database')
 charset = os.getenv('charset')
 
-#connection = pymysql.connect(host=host, user=user, password=password, db=database, charset=charset, cursorclass=pymysql.cursors.DictCursor)
-#database connection
 with connect(
     host="localhost",
     user="root",
     password="root",
     database="vkbotpr",
 ) as connection:
-    print("с базой есть соединения")
-
-# Таймер для выполнения
-#
-# def (i):
-#     threading.Timer(2.0, printit, [i+1]).start()
-#     vk.method('messages.send', {'user_id': 4591935, 'message': 'Привет ' + str(i),
-#                                 'random_id': random.randint(0, 1000)})
-#     print("Hello ", i)
-#
-# printit(1)
+    print("Соединение с базой установлено") #проверка
 
 # Основной цикл программы
 for event in longpoll.listen():
@@ -82,10 +70,10 @@ for event in longpoll.listen():
                         result = cursor.fetchall()
                         n = len(result)
                     if n == 0:
-                        query = "INSERT INTO users (fist_name, last_name, user_id, login) VALUES (%s, %s, %s, %s)"
+                        query = "INSERT INTO users (first_name, last_name, user_id) VALUES (%s, %s, %s)"
                         print("Запрос №2: " + query)
                         with connection.cursor(buffered=True) as cursor:
-                            cursor.execute (query, (user["first_name"], user["last_name"], user["id"], user['screen_name']))
+                            cursor.execute (query, (user["first_name"], user["last_name"], user["id"]))
             except Error as e:
                 print("Ошибка соединения №1: " + str(e))
             #a = input("dffdsfsdg")
@@ -150,7 +138,7 @@ for event in longpoll.listen():
                         if params[0] in ['','statements', 'add', 'добавить']:
                             #cur = connection.cursor()
                             # Добавляем заявление в таблицу
-                            query = "INSERT INTO statements (name, deadline, statements, user_id) VALUES (%s, %s, %s, %s)"
+                            query = "INSERT INTO statements (name, deadline, statements, id_user) VALUES (%s, %s, %s, %s)"
                             print("Запрос №4.1: "+ query)
                             cursor.execute(query,
                                         (params[1], params[2], params[3].strip(' '), user["id"]))
@@ -158,7 +146,7 @@ for event in longpoll.listen():
                             #cur.close()
                         else:
                         #    cur = connection.cursor()
-                            query = "SELECT * FROM users, statements WHERE statements.user_id = " + str(user["id"]) + " and users.user_id = " + str(user["id"])
+                            query = "SELECT * FROM users, statements WHERE statements.id_user = " + str(user["id"]) + " and users.user_id = " + str(user["id"])
                             print("Запрос №4.2: "+ query)
                             cursor.execute(query)
                             rows = cursor.fetchall()
