@@ -53,15 +53,13 @@ for event in longpoll.listen():
                                                      "military, blacklisted, blacklisted_by_me, "
                                                      "can_be_invited_group"})[0]
             print(user["first_name"])
-            vk.method('messages.send', {'peer_id': event.user_id, 'message': 'Приветствую Вас, ' + user[
+
             cur = connection.cursor()
             cur.execute("SELECT * FROM users WHERE vk_id=" + str(user["id"]))
             rows = cur.fetchall()
-            for row in rows:
             id_user = row['id']
             print(id_user)
-            vk.method('messages.send', {'peer_id': event.user_id, 'message': "first_name"] + '! Я бот!' + 'Напишите текст Вашего обращения по форме: Заявление. Текст. Контактные данные для обратной связи (адрес электронной почты, номер телефона).',
-                                        'random_id': random.randint(0, 1000)})
+            vk.method('messages.send', {'peer_id': event.user_id, 'message': 'Приветствую Вас, '+ ["first_name"] + '! Я бот!' + 'Напишите текст Вашего обращения по форме: Заявление. Текст. Контактные данные для обратной связи (адрес электронной почты, номер телефона)', 'random_id': random.randint(0, 1000)})
             try:
                with connect (
                        host="localhost",
